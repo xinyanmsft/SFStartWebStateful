@@ -1,0 +1,129 @@
+{
+  "WadCfg": {
+    "DiagnosticMonitorConfiguration": {
+      "DiagnosticInfrastructureLogs": { },
+      "Directories": { },
+      "PerformanceCounters": {
+        "PerformanceCounterConfiguration": [
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\Processor(_Total)\\% Processor Time",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ { "displayName": "Memory" } ],
+            "counterSpecifier": "\\Memory\\Available MBytes",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\Memory\\Committed Bytes",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\Memory\\Page Faults/sec",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\LogicalDisk(C:)\\Disk Write Bytes/sec",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\LogicalDisk(C:)\\Disk Read Bytes/sec",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\LogicalDisk(D:)\\Disk Write Bytes/sec",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\LogicalDisk(D:)\\Disk Read Bytes/sec",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\Process(IISExpress)\\Thread Count",
+            "sampleRate": "PT3M"
+          },
+          {
+            "annotation": [ ],
+            "counterSpecifier": "\\Process(w3wp)\\Private Bytes",
+            "sampleRate": "PT3M"
+          }
+        ]
+      },
+      "WindowsEventLog": {
+        "DataSource": [
+          { "name": "Application!*[System[(Level=1 or Level=2 or Level=3)]]" },
+          { "name": "System!*[System[(Level=1 or Level=2)]]" },
+          { "name": "Windows Azure!*[System[(Level=1 or Level=2 or Level=3 or Level=4)]]" }
+        ]
+      },
+      "EtwProviders": {
+        "EtwEventSourceProviderConfiguration": [
+          {
+            "scheduledTransferPeriod": "PT5M",
+            "provider": "Microsoft-ServiceFabric-Actors",
+            "scheduledTransferKeywordFilter": "1",
+            "Event": [ ],
+            "DefaultEvents": { "eventDestination": "ServiceFabricReliableActorEventTable" }
+          },
+          {
+            "scheduledTransferPeriod": "PT5M",
+            "provider": "Microsoft-ServiceFabric-Services",
+            "Event": [ ],
+            "DefaultEvents": { "eventDestination": "ServiceFabricReliableServiceEventTable" }
+          },
+          {
+            "scheduledTransferPeriod": "PT5M",
+            "provider": "MyCompany-Application1.Gateway",
+            "Event": [ ],
+            "DefaultEvents": { }
+          },
+          {
+            "scheduledTransferPeriod": "PT5M",
+            "provider": "MyCompany-Application1.FabricApplication-WebService2",
+            "Event": [ ],
+            "DefaultEvents": { }
+          }
+        ],
+        "EtwManifestProviderConfiguration": [
+          {
+            "scheduledTransferPeriod": "PT5M",
+            "scheduledTransferLogLevelFilter": "Information",
+            "provider": "cbd93bc2-71e5-4566-b3a7-595d8eeca6e8",
+            "scheduledTransferKeywordFilter": "4611686018427387904",
+            "Event": [ ],
+            "DefaultEvents": { "eventDestination": "ServiceFabricSystemEventTable" }
+          }
+        ]
+      },
+      "Logs": { },
+      "overallQuotaInMB": 50000,
+      "eventVolume": "Large",
+      "Sinks": "applicationInsights.errors"
+    },
+    "SinksConfig": {
+      "Sink": [
+        {
+          "ApplicationInsights": "{appInsightKey}",
+          "Channels": {
+            "Channel": [
+              {
+                "LogLevel": "Verbose",
+                "Name": "errors"
+              }
+            ]
+          },
+          "Name": "applicationInsights"
+        }
+      ]
+    }
+  },
+  "storageAccount": "{storageAccountName}"
+}

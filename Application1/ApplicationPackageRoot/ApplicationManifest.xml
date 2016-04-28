@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="Application1.FabricApplicationType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+   <Parameters>
+      <Parameter Name="WebService_MinReplicaSetSize" DefaultValue="2" />
+      <Parameter Name="WebService_PartitionCount" DefaultValue="1" />
+      <Parameter Name="WebService_TargetReplicaSetSize" DefaultValue="3" />
+      <Parameter Name="Gateway_InstanceCount" DefaultValue="-1" />
+   </Parameters>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="Application1.WebServicePkg" ServiceManifestVersion="1.0.0" />
+      <ConfigOverrides />
+   </ServiceManifestImport>
+   <ServiceManifestImport>
+      <ServiceManifestRef ServiceManifestName="Application1.GatewayPkg" ServiceManifestVersion="1.0.0" />
+      <ConfigOverrides />
+   </ServiceManifestImport>
+   <DefaultServices>
+      <Service Name="WebService">
+         <StatefulService ServiceTypeName="WebServiceType" TargetReplicaSetSize="[WebService_TargetReplicaSetSize]" MinReplicaSetSize="[WebService_MinReplicaSetSize]">
+            <UniformInt64Partition PartitionCount="[WebService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+         </StatefulService>
+      </Service>
+      <Service Name="Gateway">
+         <StatelessService ServiceTypeName="GatewayType" InstanceCount="[Gateway_InstanceCount]">
+            <SingletonPartition />
+         </StatelessService>
+      </Service>
+   </DefaultServices>
+</ApplicationManifest>
