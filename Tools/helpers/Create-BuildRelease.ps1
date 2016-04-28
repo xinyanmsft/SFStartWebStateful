@@ -17,7 +17,11 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
- $repoName
+ $repoName,
+
+ [Parameter(Mandatory=$True)]
+ [string]
+ $buildDefinitionName
 )
 
 $ErrorActionPreference = "Stop"
@@ -198,7 +202,7 @@ Function CreateScriptBuildStep{
     'displayName' = "Script $name";
     'task' = @{'id' = 'e213ff0f-5d5c-4791-802d-52ea3e7be1f1'; 'versionSpec' = '*'};
     'inputs' = @{
-      'scriptName' = $name;
+      'scriptName' = $scriptName;
       'arguments' = $arguments;
       'workingFolder' = ''
     };
@@ -230,9 +234,6 @@ Function CreateServiceEndpoint{
 
  $createServiceEndpointUrl = $accountUrl + "defaultcollection/" + $projectId + "/_apis/distributedtask/serviceendpoints"
 
- Write-Host $createServiceEndpointUrl
- Write-Host (ConvertTo-Json $serviceEndpoint -Depth 100)
-
  $createResult = Invoke-RestMethod -Method Post -Body (ConvertTo-Json $serviceEndpoint -Depth 100) -Uri ($createServiceEndpointUrl + $vsoPreviewApiVersion) -Header $vsoCommonHeader
  return $createResult
 }
@@ -249,7 +250,7 @@ Function CreateRemoveCluster{
 	inputs = @{
 		ConnectedServiceNameSelector = "ConnectedServiceName";
         ConnectedServiceName = $serviceEndPointId;
-        action = "Delete";
+        action = "DeleteRG";
         actionClassic = "Select Resource Group";
         resourceGroupName = $env:ServiceFabricClusterResourceGroupName;
         location = $env:ServiceFabricClusterLocation        
@@ -292,10 +293,10 @@ Function CreateBuildDefinition{
 
   $step1 = CreateNuGetRestoreBuildStep;
   $step2 = CreateMSBuildStep 'Build' 'Application1.sln' ''
-  $step3 = CreateMSBuildStep 'Package' 'Application1\\Application1.FabricApplication.sfproj' '/t:Package'
+  $step3 = CreateMSBuildStep 'Package' 'Application1\Application1.FabricApplication.sfproj' '/t:Package'
   $step4 = CreateRemoveCluster $serviceEndPointId
   $step5 = CreateDeployCluster $serviceEndPointId
-  $step6 = CreateScriptBuildStep 'Deploy' 'Application1/Scripts/Deploy-FabricApplication.ps1' '-PublishProfileFile Application1/PublishProfiles/Cloud.xml -ApplicationPackagePath Application1/pkg/$(BuildConfiguration)'
+  $step6 = CreateScriptBuildStep 'Deploy' 'Application1\Scripts\Deploy-FabricApplication.ps1' '-PublishProfileFile Application1\PublishProfiles\CI.xml -ApplicationPackagePath Application1\pkg\$(BuildConfiguration) -OverwriteBehavior Always'
 
   $triggers = CreateBuildTriggers
   $variables = CreateBuildVariables
@@ -321,18 +322,12 @@ Function CreateBuildDefinition{
   
   $buildUrl = $accountUrl + 'defaultcollection/' + $projectName + '/_apis/build/definitions'
 
-  Write-Host (ConvertTo-Json $newBuild -Depth 100)
-
   $createBuildResult = Invoke-RestMethod -Method Post -Body (ConvertTo-Json $newBuild -Depth 100) -Uri ($buildUrl + $vsoApiVersion) -Header $vsoCommonHeader
-  Write-Host $createBuildResult
-
-  Write-Host "Build definition $buildName created."
 }
 
 $project = CreateProject
 $repo = CreateRepo $project.id
 
 $serviceEndpoint = CreateServiceEndpoint $project.id
-Write-Host $serviceEndpoint
 
-CreateBuildDefinition "CI_Build" $repo.id $repo.name $repo.url $repo.project.name $project.id $serviceEndpoint.id
+CreateBuildDefinition $buildDefinitionName $repo.id $repo.name $repo.url $repo.project.name $project.id $serviceEndpoint.id

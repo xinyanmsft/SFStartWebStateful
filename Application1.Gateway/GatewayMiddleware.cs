@@ -1,17 +1,17 @@
 ﻿using Microsoft.Owin;
 using Microsoft.ServiceFabric.Services.Communication.Client;
 using System;
-using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Health;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Application1.Gateway
 {
+    /// <summary>
+    /// An Owin middleware to dispatch incoming web requests to HTTP stateful backend services.
+    /// </summary>
     internal class GatewayMiddleware : OwinMiddleware
     {
         private ServiceContext _serviceContext;
@@ -30,8 +30,7 @@ namespace Application1.Gateway
                 throw new ArgumentNullException(nameof(context));
             }
 
-            string correlationId = Guid.NewGuid().ToString();
-            HttpRequestDispatcherProvider provider = new HttpRequestDispatcherProvider(null, new[] { new ExceptionHandler(_serviceContext) }, correlationId);
+            HttpRequestDispatcherProvider provider = new HttpRequestDispatcherProvider(null, new[] { new ExceptionHandler(_serviceContext) }, Guid.NewGuid().ToString());
             ServicePartitionClient<HttpRequestDispatcher> servicePartitionClient = new ServicePartitionClient<HttpRequestDispatcher>(provider, 
                                                                                                                                      _option.ServiceUri, 
                                                                                                                                      _option.GetServicePartitionKey?.Invoke(context));
@@ -77,27 +76,6 @@ namespace Application1.Gateway
                     await responseMessage.Content.CopyToAsync(context.Response.Body);
                 }
             });
-        }
-    }
-
-    internal class ExceptionHandler : IExceptionHandler
-    {
-        private ServiceContext _serviceContext;
-
-        public ExceptionHandler(ServiceContext serviceContext)
-        {
-            _serviceContext = serviceContext;
-        }
-
-        public bool TryHandleException(ExceptionInformation exceptionInformation, OperationRetrySettings retrySettings, out ExceptionHandlingResult result)
-        {
-            FabricClient client = new FabricClient();
-            HealthInformation info = new HealthInformation("Gateway", "Exception", HealthState.Error);
-            ServiceHealthReport health = new ServiceHealthReport(_serviceContext.ServiceName, info);
-            client.HealthManager.ReportHealth(health);
-
-            result = new ExceptionHandlingThrowResult();
-            return true;
         }
     }
 }

@@ -29,9 +29,6 @@ namespace Application1.WebService
                 context.Response.OnSendingHeaders(state =>
                 {
                     context.Response.Headers["Cache-Control"] = "no-cache";
-#if DEBUG
-                    context.Response.Headers["X-Served-By"] = _serviceContext.ServiceName.ToString();
-#endif
                 }, context);
 
                 await this.Next.Invoke(context);

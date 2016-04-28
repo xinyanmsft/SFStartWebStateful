@@ -118,7 +118,7 @@ namespace Application1.WebService
         {
             return new ServiceReplicaListener[]
             {
-                new ServiceReplicaListener(serviceContext => new OwinCommunicationListener((appBuilder) =>
+                new ServiceReplicaListener(serviceContext => new OwinCommunicationListener(appBuilder =>
                 {
                     appBuilder.Use(typeof(ServiceMiddleware), this.Context);
                     Startup.ConfigureApp(appBuilder, this.Context, this);

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.Owin;
+using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.StaticFiles;
+using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Owin;
-using Microsoft.Owin;
-using Microsoft.Owin.StaticFiles;
-using Microsoft.Owin.FileSystems;
-using Microsoft.ServiceFabric.Services.Client;
+using System;
+using System.Collections.Generic;
+using System.Fabric;
 
 namespace Application1.Gateway
 {
@@ -31,6 +28,8 @@ namespace Application1.Gateway
         {
             List<ServiceInstanceListener> listeners = new List<ServiceInstanceListener>();
 
+            // This list defines how incoming requests should be mapped to each backend services. Add
+            // additional backend services to this list.
             List<GatewayOption> options = new List<GatewayOption>();
             GatewayOption option1 = new GatewayOption()
             {
@@ -55,6 +54,7 @@ namespace Application1.Gateway
                     });
                 }
 
+                // Allow serving static files from Contents directory
                 appBuilder.UseFileServer(new FileServerOptions()
                 {
                     RequestPath = PathString.Empty,

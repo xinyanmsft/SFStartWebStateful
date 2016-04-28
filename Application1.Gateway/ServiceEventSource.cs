@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Fabric.Health;
 
 namespace Application1.Gateway
 {
@@ -22,7 +23,10 @@ namespace Application1.Gateway
         }
 
         // Instance constructor is private to enforce singleton semantics
-        private ServiceEventSource() : base() { }
+        private ServiceEventSource() : base()
+        {
+            _fabricClient = new FabricClient();
+        }
 
         #region Keywords
         // Event keywords can be used to categorize events. 
@@ -81,6 +85,16 @@ namespace Application1.Gateway
                     serviceContext.NodeContext.NodeName,
                     finalMessage);
             }
+        }
+
+        [NonEvent]
+        public void ReportServiceHealth(ServiceContext serviceContext, HealthState healthState, string property)
+        {
+            HealthInformation info = new HealthInformation("Gateway", property, healthState);
+            ServiceHealthReport health = new ServiceHealthReport(serviceContext.ServiceName, info);
+            _fabricClient.HealthManager.ReportHealth(health);
+
+            this.ServiceMessage(serviceContext, "Report health {0} {1}", property, healthState);
         }
 
         // For very high-frequency events it might be advantageous to raise events using WriteEventCore API.
@@ -193,5 +207,7 @@ namespace Application1.Gateway
         }
 #endif
         #endregion
+
+        private FabricClient _fabricClient;
     }
 }

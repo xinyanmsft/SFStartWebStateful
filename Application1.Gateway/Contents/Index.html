@@ -4,31 +4,67 @@
 <head>
     <meta charset="utf-8" />
     <title>Hello World</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <style>
+        .input-group {
+            margin: 20px;
+        }
+        .btn {
+            margin-left: 20px;
+        }
+        p {
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
-    Please enter user Id:<br /> 
-    <input type="text" id="userId" />
-    <button type="button" onclick="queryUser()">Show User Info</button>
-    <br />
-    <br />
-    First Name: <input type="text" id="firstname" />
-    <br />
-    Last Name: <input type="text" id="lastname" />
-    <br />
-    <button type="button" style="visibility:hidden" onclick="createUser()" id="btnCreate">Create new user</button>
-    <button type="button" style="visibility:hidden" onclick="updateUser()" id="btnUpdate">Update this user</button>
-    <button type="button" style="visibility:hidden" onclick="deleteUser()" id="btnDelete">Delete this user</button>
-    
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="input-group">
+                <span class="input-group-addon" id="user-id-label">Please enter user Id: </span>
+                <input type="text" id="userId" class="form-control" aria-describedby="user-id-label">
+            </div>
+            <button type="button" onclick="queryUser()" class="btn btn-primary">Show User Info</button>
+
+            <div class="input-group">
+                <span class="input-group-addon" id="first-name-label">First Name:</span>
+                <input type="text" id="firstname" class="form-control" aria-describedby="first-name-label">
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon" id="last-name-label">Last Name:</span>
+                <input type="text" id="lastname" class="form-control" aria-describedby="last-name-label">
+            </div>
+
+            <button type="button" class="btn btn-primary" style="visibility:hidden" onclick="createUser()" id="btnCreate">Create new user</button>
+            <button type="button" class="btn btn-primary" style="visibility:hidden" onclick="updateUser()" id="btnUpdate">Update this user</button>
+            <button type="button" class="btn btn-danger" style="visibility:hidden" onclick="deleteUser()" id="btnDelete">Delete this user</button>
+
+            <p id="message" class="text-danger"></p>
+        </div>
+    </div>
+
     <script>
+        var timeout;
+        function myAlert(text) {
+            clearTimeout(timeout);
+            document.getElementById("message").textContent = text;
+
+            timeout = setTimeout(function () {
+                document.getElementById("message").textContent = null;
+            }, 5000)
+        }
+
         function getUserId() {
             var str = document.getElementById("userId").value;
             if (str === '' || str === null || str.trim() === '') {
-                alert('Please enter user Id');
+                myAlert('Please enter user Id');
                 return -1;
             }
             var id = parseInt(str);
             if (id <= 0 || isNaN(id)) {
-                alert('User Id must be a positive number!');
+                myAlert('User Id must be a positive number!');
                 return -1;
             }
             return id;
@@ -40,7 +76,7 @@
             document.getElementById('btnDelete').style.visibility = 'hidden';
 
             var btns = buttons.split(';');
-            for(i = 0; i < btns.length; i++) {
+            for (i = 0; i < btns.length; i++) {
                 var b = document.getElementById(btns[i]);
                 b.style.visibility = 'visible';
             }
@@ -70,10 +106,10 @@
                         document.getElementById("firstname").value = '';
                         document.getElementById("lastname").value = '';
 
-                        alert("User doesn't exist.");
+                        myAlert("User doesn't exist.");
                         enableButtons('btnCreate');
                     } else {
-                        alert(http.statusText);
+                        myAlert(http.statusText);
                     }
                 }
             };
@@ -88,9 +124,9 @@
             http.onreadystatechange = function () {
                 if (http.readyState == 4) {
                     if (http.status >= 400) {
-                        alert(http.statusText);
+                        myAlert(http.statusText);
                     } else {
-                        alert("Update succeeded.");
+                        myAlert("Update succeeded.");
                     }
                 }
             };
@@ -107,9 +143,9 @@
             http.onreadystatechange = function () {
                 if (http.readyState == 4) {
                     if (http.status >= 400) {
-                        alert(http.statusText);
+                        myAlert(http.statusText);
                     } else {
-                        alert("Create succeeded.");
+                        myAlert("Create succeeded.");
                         queryUser();
                     }
                 }
@@ -127,9 +163,9 @@
             http.onreadystatechange = function () {
                 if (http.readyState == 4) {
                     if (http.status >= 400) {
-                        alert(http.statusText);
+                        myAlert(http.statusText);
                     } else {
-                        alert("Delete succeeded.");
+                        myAlert("Delete succeeded.");
                         queryUser();
                     }
                 }
@@ -140,4 +176,5 @@
         }
     </script>
 </body>
+
 </html>

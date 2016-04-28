@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\UsersController.cs" />
+    <Compile Include="ServiceExceptionFilterAttribute.cs" />
     <Compile Include="ServiceMiddleware.cs" />
     <Compile Include="IWebService.cs" />
     <Compile Include="OwinCommunicationListener.cs" />

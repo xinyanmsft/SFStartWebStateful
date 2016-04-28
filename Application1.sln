@@ -6,7 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{27606BA8-267F-4B38-B92F-A46520ED0281}"
 	ProjectSection(SolutionItems) = preProject
 		Tools\Setup_AppInsights.ps1 = Tools\Setup_AppInsights.ps1
-		Tools\Setup_CI_CD_VSO.ps1 = Tools\Setup_CI_CD_VSO.ps1
+		Tools\Setup_CI_CD_VSTS.ps1 = Tools\Setup_CI_CD_VSTS.ps1
 	EndProjectSection
 EndProject
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "Application1.FabricApplication", "Application1\Application1.FabricApplication.sfproj", "{EE45638E-7CF0-4922-B183-1EFAE560F3E9}"
@@ -14,6 +14,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application1.Gateway", "Application1.Gateway\Application1.Gateway.csproj", "{92A78D97-7126-45AD-852D-E3705CFA9E82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application1.WebService", "Application1.WebService\Application1.WebService.csproj", "{9C19DFDA-9D9C-4DD1-B047-62ACC5374967}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14B725C1-516A-45CC-8D80-88A00F0962E7}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

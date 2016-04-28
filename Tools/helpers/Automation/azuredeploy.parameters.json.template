@@ -36,7 +36,7 @@
       "value": "/subscriptions/{subscriptionId}/resourceGroups/{keyVaultResourceGroupName}/providers/Microsoft.KeyVault/vaults/{keyVaultName}"
     },
     "certificateUrlvalue": {
-      "value": "https://{keyVaultName}.vault.azure.net:443/secrets/{keyVaultLocation}"
+      "value": "{serviceFabricCertificateSecretId}"
     },
     "clusterProtectionLevel": {
       "value": "EncryptAndSign"

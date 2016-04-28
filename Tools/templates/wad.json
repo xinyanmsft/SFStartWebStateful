@@ -87,7 +87,7 @@
           },
           {
             "scheduledTransferPeriod": "PT5M",
-            "provider": "MyCompany-Application1.FabricApplication-WebService2",
+            "provider": "MyCompany-Application1.FabricApplication-WebService",
             "Event": [ ],
             "DefaultEvents": { }
           }
@@ -106,7 +106,7 @@
       "Logs": { },
       "overallQuotaInMB": 50000,
       "eventVolume": "Large",
-      "Sinks": "applicationInsights.errors"
+      "Sinks": "applicationInsights.verbose"
     },
     "SinksConfig": {
       "Sink": [
@@ -116,7 +116,7 @@
             "Channel": [
               {
                 "LogLevel": "Verbose",
-                "Name": "errors"
+                "Name": "verbose"
               }
             ]
           },

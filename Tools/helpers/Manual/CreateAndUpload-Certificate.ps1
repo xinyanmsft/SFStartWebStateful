@@ -44,9 +44,14 @@ if (Test-Path $PfxFileOutputPath)
 
 $c = Export-PfxCertificate -Cert $cert -FilePath $PfxFileOutputPath -Password $SecureCertificatePassword
 
+# Import to personal\my
+$c2 = Import-PfxCertificate -FilePath $PfxFileOutputPath -CertStoreLocation "Cert:\CurrentUser\My" -Password $SecureCertificatePassword
+
 # Create Key Vault
-# TODO: Check if KeyVault exist previously
-$keyVault = New-AzureRmKeyVault -VaultName $KeyVaultName -ResourceGroupName $KeyVaultResourceGroupName -Location $KeyVaultLocation -EnabledForDeployment
+$keyVault = Get-AzureRmKeyVault -VaultName $KeyVaultName -ResourceGroupName $KeyVaultResourceGroupName -ErrorAction SilentlyContinue
+if (!$keyVault){
+	$keyVault = New-AzureRmKeyVault -VaultName $KeyVaultName -ResourceGroupName $KeyVaultResourceGroupName -Location $KeyVaultLocation -EnabledForDeployment
+}
 
 # Create Certificate
 $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $PfxFileOutputPath, $SecureCertificatePassword

@@ -22,7 +22,7 @@ namespace Application1.WebService
             // Configure Web API for self-host. 
             HttpConfiguration config = new HttpConfiguration();
             config.DependencyResolver = new ServiceDependencyResolver(config.DependencyResolver, service);
-            config.Filters.Add(new GlobalExceptionFilterAttribute(context));
+            config.Filters.Add(new ServiceExceptionFilterAttribute(context));
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
@@ -32,26 +32,6 @@ namespace Application1.WebService
 
             
             appBuilder.UseWebApi(config);
-        }
-    }
-
-    internal class GlobalExceptionFilterAttribute : ExceptionFilterAttribute
-    {
-        private static Lazy<FabricClient> _client = new Lazy<FabricClient>(() => new FabricClient());
-        private ServiceContext _serviceContext;
-
-        public GlobalExceptionFilterAttribute(ServiceContext context)
-        {
-            _serviceContext = context;
-        }
-
-        public override void OnException(HttpActionExecutedContext actionExecutedContext)
-        {
-            HealthInformation info = new HealthInformation("WebService", "Exception", HealthState.Error);
-            ServiceHealthReport health = new ServiceHealthReport(_serviceContext.ServiceName, info);
-            _client.Value.HealthManager.ReportHealth(health);
-
-            ServiceEventSource.Current.ServiceRequestFailed(actionExecutedContext.Request.RequestUri.ToString(), actionExecutedContext.Exception.ToString());
         }
     }
 
