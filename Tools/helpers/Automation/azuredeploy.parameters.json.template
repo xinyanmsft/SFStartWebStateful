@@ -24,7 +24,7 @@
       "value": 80
     },
     "loadBalancedAppPort2": {
-      "value": 8180
+      "value": 8082
     },
     "certificateStorevalue": {
       "value": "My"

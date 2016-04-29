@@ -77,6 +77,9 @@ $secretValue = ConvertTo-SecureString -String $secretContent -AsPlainText -Force
 Sleep 15
 
 # Register certificate as a secret in the key vault.
+
+$s = Remove-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $CertificateSecretName -Force -Confirm:$false -ErrorAction Ignore
+
 $s = Set-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $CertificateSecretName -SecretValue $secretValue
 $certificateSecret = Get-AzureKeyVaultSecret -VaultName $KeyVaultName -Name $CertificateSecretName -IncludeVersions
 
