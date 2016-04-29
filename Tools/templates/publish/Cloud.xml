@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PublishProfile xmlns="http://schemas.microsoft.com/2015/05/fabrictools">
+  <ClusterConnectionParameters ConnectionEndpoint="{clusterName}.{clusterLocation}.cloudapp.azure.com:19000"
+                                    X509Credential="true"
+                                    ServerCertThumbprint="{thumbprint}"
+                                    FindType="FindByThumbprint"
+                                    FindValue="{thumbprint}"
+                                    StoreLocation="LocalMachine"
+                                    StoreName="My" />
+  <ApplicationParameterFile Path="..\ApplicationParameters\Cloud.xml" />
+</PublishProfile>
