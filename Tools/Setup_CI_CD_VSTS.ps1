@@ -91,6 +91,7 @@ $env:ServicePrincipalTenantId = $servicePrincipal.Get_Item('TenantId')
 $env:ServicePrincipalSubscriptionName = $servicePrincipal.Get_Item('SubscriptionName')
 $env:ServicePrincipalSubscriptionId = $servicePrincipal.Get_Item('SubscriptionId')
 
+$clusterName = $clusterName.ToLower()
 $dnsName = "$clusterName.$resourceGroupLocation.cloudapp.azure.com"
 
 $certFile = Join-Path (pwd) 'cert.pfx'
@@ -150,5 +151,4 @@ Write-Host ""
 Write-Host "Please follow the 'Set up your build machine' section in https://azure.microsoft.com/en-us/documentation/articles/service-fabric-set-up-continuous-integration/#set-up-your-build-machine to set up your build agent, using certificate $certFile"
 Write-Host "For testing purposes, this machine already has the certificate installed. You can use this machine as your build agent (set your build agent to run as local system in this case)."
 Write-Host ""
-Write-Host "The generated build definition will recreate the Service Fabric cluster each time, which takes 15-30 minutes. If you are Okay with reusing the same cluster, you can disable the 'Remove existing cluster' and 'Provision Secure Cluster' build steps after the first build to save considerable amount of time."
 Write-Host "********************************************************************************"

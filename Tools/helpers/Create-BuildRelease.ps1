@@ -306,7 +306,7 @@ Function CreateBuildDefinition{
     type = 'build';
     quality = 'definition';
     queue = @{'id' = 1};
-	build = @($step1, $step2, $step3, $step4, $step5, $step6);
+	build = @($step1, $step2, $step3, $step5, $step6);
     project = @{'id' = $projectId};
     repository = @{
       id = $repoId;
