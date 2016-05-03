@@ -122,9 +122,13 @@ $env:ServiceFabricApplicationProjectPath = "Application1"
 $env:ServicePrincipalPassword = $guidPassword
 $env:ServiceFabricClusterAdminPassword = $adminPassword
 
-$vsoAccount = Read-Host "Please enter your Visual Sutdio Team Serices URL, such as 'https://company.visualstudio.com'"
+$vsoAccount = Read-Host "Please enter your Visual Sutdio Team Services URL, such as 'https://company.visualstudio.com'"
 $vsoUser = Read-Host "Please enter Visual Studio Team Services username, such as john@contoso.com"
-$vsoPassword = Read-Host "Please enter Visual Studio Team Services password, the one you use to access your GIT repo"
+$vsoPassword = Read-Host "Please enter Visual Studio Team Services password, the one you use to access your GIT repo" -AsSecureString
+
+$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($vsoPassword)
+$vsoPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+
 $vsoProjectName = Read-Host "Please enter the project name"
 $buildDefinitionName = Read-Host "Please enter the build name, such as 'BUILD_CI'"
 if ([string]::IsNullOrEmpty($buildDefinitionName)) {

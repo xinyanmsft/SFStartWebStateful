@@ -29,7 +29,13 @@ if ([String]::IsNullOrEmpty($isAzureModulePresent) -eq $true)
 }
 
 Import-Module -Name AzureRM.Profile
-$login = Login-AzureRmAccount -SubscriptionID $subscriptionId
+try {
+  $context = Get-AzureRmContext
+}
+catch {
+  $login = Login-AzureRmAccount -SubscriptionID $subscriptionId  
+}
+
 $azureSubscription = Get-AzureRmSubscription -SubscriptionID $subscriptionId
 $connectionName = $azureSubscription.SubscriptionName
 $tenantId = $azureSubscription.TenantId
