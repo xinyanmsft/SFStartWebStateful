@@ -22,10 +22,10 @@ function VerifyVSTSConnection([string]$accountUrl, [string]$userName, [string]$p
 function IsVSTSBuildDefinitionExist([string]$accountUrl, [string]$userName, [string]$password, [string]$projectName, [string]$buildDefinitionName) {
     $authHeader = GetVSTSAuthHeader $userName $password
     $apiVersion = GetVSTSAPIVersion
-    
+
     $buildUrl = $accountUrl + 'defaultcollection/' + $projectName + '/_apis/build/definitions'
     try {
-        $getResult = Invoke-RestMethod -Method Get -Uri ($buildUrl + $apiVersion) -Header $authHeader -ErrorAction SilentlyContinue | Out-Null
+        $getResult = Invoke-RestMethod -Method Get -Uri ($buildUrl + $apiVersion) -Header $authHeader -ErrorAction SilentlyContinue
         if ($getResult -and $getResult.value) {
             foreach($d in $getResult.value) {
                 if ([string]::Compare($d.name, $buildDefinitionName, $true) -eq 0) {
@@ -36,20 +36,20 @@ function IsVSTSBuildDefinitionExist([string]$accountUrl, [string]$userName, [str
     }
     catch {
     }
-    
+
     return $false
 }
 
 function IsVSTSReleaseDefinitionExist([string]$accountUrl, [string]$userName, [string]$password, [string]$projectName, [string]$releaseDefinitionName) {
     $authHeader = GetVSTSAuthHeader $userName $password
-    
+
     $releaseUrl = $accountUrl.ToLower().Replace(".visualstudio.com/", ".vsrm.visualstudio.com/")
     $getReleaseUrl = $releaseUrl + 'defaultcollection/' + $projectName + '/_apis/release/definitions?api-version=3.0-preview.1'
     try {
-        $getResult = Invoke-RestMethod -Method Get -Uri ($getReleaseUrl) -Header $authHeader -ErrorAction SilentlyContinue | Out-Null
+        $getResult = Invoke-RestMethod -Method Get -Uri ($getReleaseUrl) -Header $authHeader -ErrorAction SilentlyContinue
         if ($getResult -and $getResult.value) {
             foreach($d in $getResult.value) {
-                if ([string]::Compare($d.name, $buildDefinitionName, $true) -eq 0) {
+                if ([string]::Compare($d.name, $releaseDefinitionName, $true) -eq 0) {
                     return $true
                 }
             }
@@ -86,7 +86,7 @@ function CreateVSTSCIFlow([string]$accountUrl, [string]$userName, [string]$passw
     $context.clusterRGName = $clusterRGName
     $context.clusterLocation = $clusterLocation
     $context.outputFolderName = $outputFolderName
-    
+
     $project = CreateVSTSProject $context
     $repo = CreateVSTSRepo $context
     $serviceEndpoint = SelectServiceEndpoints $context
@@ -96,7 +96,7 @@ function CreateVSTSCIFlow([string]$accountUrl, [string]$userName, [string]$passw
 
 function CreateVSTSProject($context) {
     $projectUrl = $context.accountUrl + "defaultcollection/_apis/projects/";
-    
+
     try {
         $getResult = Invoke-RestMethod -Method Get -Uri ($projectUrl + $context.projectName + $context.apiVersion) -Header $context.authHeader
         Write-Host "Project" $context.projectName "already exist."
@@ -175,7 +175,7 @@ function CreateVSTSBuildTriggers {
 function CreateVSTSBuildVariables {
   $buildConfig = @{value='Release';allowOverride='true' }
   $buildPlatform = @{value='x64';allowOverride='false' }
-  
+
   return @{
     BuildConfiguration = $buildConfig;
     BuildPlatform = $buildPlatform
@@ -256,7 +256,7 @@ function SelectServiceEndpoints($context) {
                     return $endpoint
                 }
             }while(!$validInput)
-        } 
+        }
     }
 
     return CreateServiceEndpoint($context)
@@ -267,21 +267,21 @@ Function CreateServiceEndpoint($context){
     $servicePrincipal = GetOrCreateServicePrincipal $context.subscriptionId $context.applicationName "Owner" $True $guidPassword
 
     $serviceEndpoint = @{
-	    'authorization' = @{
-		    'scheme' = 'ServicePrincipal';
-    		'parameters' = @{
-	    		'serviceprincipalid' = $servicePrincipal.Get_Item("ServicePrincipalId");
-		    	'serviceprincipalkey' = $servicePrincipal.Get_Item("ServicePrincipalKey");
-			    'tenantid' = $servicePrincipal.Get_Item("TenantId");
-    		}
-    	}
-	    'data' = @{
-		    'SubscriptionId' = $servicePrincipal.Get_Item("SubscriptionId");
-    		'SubscriptionName' = $servicePrincipal.Get_Item("SubscriptionName");
-	    };
-    	'name' = "CI_ConnectionEndpoint_$randomNum";
-	    'type' = 'azurerm';
-    	'url' = 'https://management.core.windows.net/'
+        'authorization' = @{
+            'scheme' = 'ServicePrincipal';
+            'parameters' = @{
+                'serviceprincipalid' = $servicePrincipal.Get_Item("ServicePrincipalId");
+                'serviceprincipalkey' = $servicePrincipal.Get_Item("ServicePrincipalKey");
+                'tenantid' = $servicePrincipal.Get_Item("TenantId");
+            }
+        }
+        'data' = @{
+            'SubscriptionId' = $servicePrincipal.Get_Item("SubscriptionId");
+            'SubscriptionName' = $servicePrincipal.Get_Item("SubscriptionName");
+        };
+        'name' = "CI_ConnectionEndpoint_$randomNum";
+        'type' = 'azurerm';
+        'url' = 'https://management.core.windows.net/'
     }
 
     $createServiceEndpointUrl = $context.accountUrl + "defaultcollection/" + $context.projectId + "/_apis/distributedtask/serviceendpoints"
@@ -299,27 +299,28 @@ function CreatePublishArtifact($context, [string]$displayName, [string]$artifact
     'displayName' = $displayName;
     'task' = @{'id' = '2ff763a7-ce83-4e1f-bc89-0ae63477cebe'; 'versionSpec' = '*'};
     'inputs' = @{
-      'PathToPublish' = $path;
+      'PathtoPublish' = $path;
       'ArtifactName' = $artifactName;
       'ArtifactType' = 'Container';
-	  'TargetPath' = '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
+      'TargetPath' = '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
     };
   }
 }
 
 function CreateDeployClusterTask($context){
     $clusterName = $context.clusterName
-    $outputFolderName = $context.outputFolderName 
+    $outputFolderName = $context.outputFolderName
+    $buildDefinitionName = $context.buildDefinitionName
     return @{
       taskId = '94a74903-f93f-4075-884f-dc11f34058b4';
       version = '*';
       name = 'Create or Update Secure Cluster';
       enabled = $true;
-	  continueOnError = $false;
-	  alwaysRun = $false;
+        continueOnError = $false;
+        alwaysRun = $false;
       definitionType = 'task';
       inputs = @{
-		ConnectedServiceNameSelector = "ConnectedServiceName";
+          ConnectedServiceNameSelector = "ConnectedServiceName";
         ConnectedServiceName = $context.serviceEndPointId;
         ConnectedServiceNameClassic = '';
         action = "Create Or Update Resource Group";
@@ -327,32 +328,32 @@ function CreateDeployClusterTask($context){
         resourceGroupName = $context.clusterRGName;
         cloudService = '';
         location = $context.clusterLocation;
-		csmFile =  "Tools/Templates/azuredeploy.json";
-        csmParametersFile = "Tools/outputFolderName/$clusterName.azuredeploy.parameters.json";
+        csmFile =  "`$(System.DefaultWorkingDirectory)/$buildDefinitionName/Tools/Templates/azuredeploy.json";
+        csmParametersFile = "`$(System.DefaultWorkingDirectory)/$buildDefinitionName/Tools/$outputFolderName/$clusterName.azuredeploy.parameters.json";
         overrideParameters = '';
         enableDeploymentPrerequisitesForCreate = 'false';
         enableDeploymentPrerequisitesForSelect = 'false';
         outputVariable = '';
-	}
+      }
   }
 }
 
 function CreateScriptTask([string]$name, [string]$scriptName, [string]$arguments) {
-  return @{
-      taskId = 'e213ff0f-5d5c-4791-802d-52ea3e7be1f1';
-      version = '*';
-      name = "Script $name";
-      enabled = $true;
-      continueOnError = $false;
-      alwaysRun = $false;
-      definitionType = 'task';
-      inputs = @{
-        scriptType = 'filepath';
-        scriptName = $scriptName;
-        arguments = $arguments;
-        workingFolder = ''
+    return @{
+        taskId = 'e213ff0f-5d5c-4791-802d-52ea3e7be1f1';
+        version = '*';
+        name = "Script $name";
+        enabled = $true;
+        continueOnError = $false;
+        alwaysRun = $false;
+        definitionType = 'task';
+        inputs = @{
+            scriptType = 'filepath';
+            scriptName = $scriptName;
+            arguments = $arguments;
+            workingFolder = ''
+        }
     }
-  }
 }
 
 function GetVSTSAuthHeader($userName, $password) {
@@ -374,21 +375,21 @@ function GetVSTSPreviewAPIVersion {
 function CreateVSTSReleaseDefinition($context, $tasks) {
     $buildDefinitionId = $context.buildDefinitionId
     $approval = @(@{rank = 1; isAutomated = $true; isNotificationOn = $false})
-	$environment = @{
-		name = "$clusterName-Environment";
-		rank = 1;
-		preDeployApprovals = @{'approvals' = $approval};
-		postDeployApprovals = @{'approvals' = $approval};
-		deployStep = @{ 'tasks' = $tasks };
+    $environment = @{
+        name = "$clusterName-Environment";
+        rank = 1;
+        preDeployApprovals = @{'approvals' = $approval};
+        postDeployApprovals = @{'approvals' = $approval};
+        deployStep = @{ 'tasks' = $tasks };
         environmentOptions = @{emailNotificationType = 'Always'; skipArtifactsDownload = $false; timeoutInMinutes = 0};
         demands = @('Agent.Version -gtVersion 1.87');
         conditions = @(@{name = 'ReleaseStarted'; conditionType = 'event'; value = ''});
-        executionPolicy = @{concurrencyCount = 0; queueDepthCount = 0};   
+        executionPolicy = @{concurrencyCount = 0; queueDepthCount = 0};
         queueId = 1;
         runOptions = @{EnvironmentOwnerEmailNotificationType = 'Always'; skipArtifactsDownload = 'False'; TimeoutInMinutes = '0'};
         variables = @();
         schedules = @();
-	}
+    }
     $artifact = @{
         type = 'Build';
         alias = $context.buildDefinitionName;
@@ -399,8 +400,8 @@ function CreateVSTSReleaseDefinition($context, $tasks) {
     }
 
     $newRelease = @{
-	    name = $context.releaseDefinitionName;
-	    environments = @($environment);
+        name = $context.releaseDefinitionName;
+        environments = @($environment);
         artifacts = @($artifact);
         variables = @();
         releaseNameFormat = 'Release-$(rev:r)';
@@ -418,15 +419,16 @@ function CreateVSTSReleaseDefinition($context, $tasks) {
 
 function CreateVSTSBuildDefinition($context) {
   $appName = $context.applicationName
+  $buildDefinitionName = $context.buildDefinitionName
 
   $step1 = CreateNuGetRestoreBuildStep
   $step2 = CreateMSBuildStep 'Build' "$appName.sln" ''
   $step3 = CreateMSBuildStep 'Package' "$appName\$appName.FabricApplication.sfproj" '/t:Package'
-  $step4 = CreatePublishArtifact $context 'Publish Artifact: Application Package' 'Application' "$appName"
+  $step4 = CreatePublishArtifact $context 'Publish Artifact: Application Package' 'Application' $appName
   $step5 = CreatePublishArtifact $context 'Publish Artifact: Tools' 'Tools' 'Tools'
 
   $step7 = CreateDeployClusterTask $context
-  $step8 = CreateScriptTask 'Deploy' 'Application\Scripts\Deploy-FabricApplication.ps1' '-PublishProfileFile Tools\$outputFolderName\$clusterName.CI.xml -ApplicationPackagePath Application\pkg\$(BuildConfiguration) -OverwriteBehavior Always'
+  $step8 = CreateScriptTask 'Deploy' "`$(System.DefaultWorkingDirectory)\$buildDefinitionName\Application\Scripts\Deploy-FabricApplication.ps1" "-PublishProfileFile `$(System.DefaultWorkingDirectory)\$buildDefinitionName\Tools\$outputFolderName\$clusterName.CI.xml -ApplicationPackagePath `$(System.DefaultWorkingDirectory)\$buildDefinitionName\Application\pkg\`$(BuildConfiguration) -OverwriteBehavior Always"
 
   $triggers = CreateVSTSBuildTriggers
   $variables = CreateVSTSBuildVariables
@@ -436,7 +438,7 @@ function CreateVSTSBuildDefinition($context) {
     type = 'build';
     quality = 'definition';
     queue = @{'id' = 1};
-	build = @($step1, $step2, $step3, $step4, $step5);
+    build = @($step1, $step2, $step3, $step4, $step5);
     project = @{'id' = $context.projectId};
     repository = @{
       id = $context.repoId;
@@ -446,14 +448,14 @@ function CreateVSTSBuildDefinition($context) {
       url = $context.repoUrl;
       clean = 'false'
     };
-	triggers = @($triggers);
-    variables = $variables      
+    triggers = @($triggers);
+    variables = $variables
   };
-  
+
   $buildUrl = $context.accountUrl + 'defaultcollection/' + $context.projectName + '/_apis/build/definitions'
 
   $createBuildResult = Invoke-RestMethod -Method Post -Body (ConvertTo-Json $newBuild -Depth 100) -Uri ($buildUrl + $context.apiVersion) -Header $context.authHeader
   $context.buildDefinitionId = $createBuildResult.id
 
-  CreateVSTSReleaseDefinition $context @($step7, $step8) 
+  CreateVSTSReleaseDefinition $context @($step7, $step8)
 }
