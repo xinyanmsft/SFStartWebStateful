@@ -89,7 +89,7 @@ function CreateVSTSCIFlow([string]$accountUrl, [string]$userName, [string]$passw
 
     $project = CreateVSTSProject $context
     $repo = CreateVSTSRepo $context
-    $serviceEndpoint = SelectServiceEndpoints $context
+    $serviceEndpoint = CreateServiceEndpoint $context
 
     CreateVSTSBuildDefinition $context
 }
